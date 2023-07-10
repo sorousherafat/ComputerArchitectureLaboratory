@@ -1,22 +1,33 @@
 #!/bin/sh
 
+# Check if the provided argument is a valid experiment folder
 if [ ! -d "$1" ]; then
     echo "Experiment directory does not exist"
     exit 1
 fi
 
+# Change the `cwd` to the experiment folder
 cd "$1" || exit 1
 
+# Convert photos to temporary PDF files
 for photo in Photos/*; do
+    # Get the photo name
     filename=$(basename -- "$photo")
     filename="${filename%.*}"
+    # Convert to PDF
     inkscape "$photo" --export-area-drawing --batch-process --export-type=pdf --export-filename=Photos/"$filename".pdf
 done
 
+# Create a temporary copy of the report file
 cp Report.md '~Report.md.tmp'
+
+# Change every `.svg` and `.SVG` occurance to `.pdf` because LaTeX does not support SVG
 sed -i 's/\.svg/\.pdf/gi; s/\.SVG/\.pdf/g' '~Report.md.tmp'
+
+# Convert the new report markdown file to PDF
 pandoc --from=markdown --to=pdf -o Report.pdf '~Report.md.tmp'
 
+# Remove temporary files
 rm '~Report.md.tmp'
 for photo_pdf in Photos/*.pdf; do
     rm "$photo_pdf"
