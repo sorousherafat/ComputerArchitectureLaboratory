@@ -1,0 +1,23 @@
+#!/bin/sh
+
+if [ ! -d "$1" ]; then
+    echo "Experiment directory does not exist"
+    exit 1
+fi
+
+cd "$1" || exit 1
+
+for photo in Photos/*; do
+    filename=$(basename -- "$photo")
+    filename="${filename%.*}"
+    inkscape "$photo" --export-area-drawing --batch-process --export-type=pdf --export-filename=Photos/"$filename".pdf
+done
+
+cp Report.md '~Report.md.tmp'
+sed -i 's/\.svg/\.pdf/gi; s/\.SVG/\.pdf/g' '~Report.md.tmp'
+pandoc --from=markdown --to=pdf -o Report.pdf '~Report.md.tmp'
+
+rm '~Report.md.tmp'
+for photo_pdf in Photos/*.pdf; do
+    rm "$photo_pdf"
+done
