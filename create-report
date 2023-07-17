@@ -10,12 +10,12 @@ fi
 cd "$1" || exit 1
 
 # Convert photos to temporary PDF files
-for photo in Photos/*; do
+for photo in Proteus/Photos/*.svg Proteus/Photos/*.SVG; do
     # Get the photo name
     filename=$(basename -- "$photo")
     filename="${filename%.*}"
     # Convert to PDF
-    inkscape "$photo" --export-area-drawing --batch-process --export-type=pdf --export-filename=Photos/"$filename".pdf
+    inkscape "$photo" --export-area-drawing --batch-process --export-type=pdf --export-filename=Proteus/Photos/"$filename".pdf
 done
 
 # Create a temporary copy of the report file
@@ -29,6 +29,6 @@ pandoc --from=markdown --to=pdf -o Report.pdf '~Report.md.tmp'
 
 # Remove temporary files
 rm '~Report.md.tmp'
-for photo_pdf in Photos/*.pdf; do
+for photo_pdf in Proteus/Photos/*.pdf; do
     rm "$photo_pdf"
 done
